@@ -279,7 +279,7 @@ func (a *AWSCloud) CurrentNodeName(hostname string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return selfInstance.nodeName, nil
+	return selfInstance.awsID, nil
 }
 
 // Implementation of EC2.Instances
@@ -2066,7 +2066,7 @@ func (a *AWSCloud) getInstancesByNodeNames(nodeNames []string) ([]*ec2.Instance,
 // Returns nil if it does not exist
 func (a *AWSCloud) findInstanceByNodeName(nodeName string) (*ec2.Instance, error) {
 	filters := []*ec2.Filter{
-		newEc2Filter("private-dns-name", nodeName),
+		newEc2Filter("instance-id", nodeName),
 	}
 	filters = a.addFilters(filters)
 	request := &ec2.DescribeInstancesInput{

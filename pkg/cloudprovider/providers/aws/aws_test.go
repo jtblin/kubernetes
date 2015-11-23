@@ -262,11 +262,11 @@ func contains(haystack []*string, needle string) bool {
 
 func instanceMatchesFilter(instance *ec2.Instance, filter *ec2.Filter) bool {
 	name := *filter.Name
-	if name == "private-dns-name" {
-		if instance.PrivateDnsName == nil {
+	if name == "instance-id" {
+		if instance.InstanceId == nil {
 			return false
 		}
-		return contains(filter.Values, *instance.PrivateDnsName)
+		return contains(filter.Values, *instance.InstanceId)
 	}
 	panic("Unknown filter name: " + name)
 }
@@ -608,19 +608,19 @@ func TestNodeAddresses(t *testing.T) {
 	instances := []*ec2.Instance{&instance0, &instance1}
 
 	aws1 := mockInstancesResp([]*ec2.Instance{})
-	_, err1 := aws1.NodeAddresses("instance-mismatch.ec2.internal")
+	_, err1 := aws1.NodeAddresses("instance-mismatch")
 	if err1 == nil {
 		t.Errorf("Should error when no instance found")
 	}
 
 	aws2 := mockInstancesResp(instances)
-	_, err2 := aws2.NodeAddresses("instance-same.ec2.internal")
+	_, err2 := aws2.NodeAddresses("instance-same")
 	if err2 == nil {
 		t.Errorf("Should error when multiple instances found")
 	}
 
 	aws3 := mockInstancesResp(instances[0:1])
-	addrs3, err3 := aws3.NodeAddresses("instance-same.ec2.internal")
+	addrs3, err3 := aws3.NodeAddresses("instance-same")
 	if err3 != nil {
 		t.Errorf("Should not error when instance found")
 	}
